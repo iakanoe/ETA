@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ETA</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAF4kcvxf86vV_VCZlDih9gLUhGG7bOgXY</string>
+    <string name="buscar">Buscar</string>
+</resources>

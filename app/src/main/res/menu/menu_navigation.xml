@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/grp1" android:checkableBehavior="single">
+        <item
+            android:icon="@drawable/ic_navigation_black_24dp"
+            android:tint="@color/button_grey"
+            android:title="Mapa"
+            android:id="@+id/nav_mapa" />
+        <item
+            android:icon="@drawable/ic_place_black_24dp"
+            android:tint="@color/button_grey"
+            android:title="Mis lugares"
+            android:id="@+id/nav_lugares" />
+    </group>
+
+    <group android:id="@+id/grp2" android:checkableBehavior="single">
+        <item
+            android:title="Configuración"
+            android:id="@+id/nav_config" />
+    </group>
+</menu>
