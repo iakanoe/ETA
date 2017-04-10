@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="statusBarColor">#E0E0E0</color>
     <color name="toolbarColor">#F5F5F5</color>
+    <color name="fabColor">#F5F5F5</color>
     <color name="backgroundColor">#FAFAFA</color>
     <color name="searchBarColor">#FAFAFA</color>
     <color name="button_grey">#8A000000</color>
