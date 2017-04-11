@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         goToLocation(myLocation);
         mapa.setTrafficEnabled(false);
         mapa.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {@Override public void onMapLongClick(LatLng latLng){mapa.addMarker(new MarkerOptions().position(latLng).title("Marcador Colocado"));}});
-        Log.println(Log.INFO, "textSize", String.valueOf(((EditText) findViewById(R.id.buscarTxt)).getTextSize()));
+        Log.println(Log.ASSERT, "textSize", String.valueOf(((EditText) findViewById(R.id.buscarTxt)).getTextSize()));
     }
     void reqLocPerms(ActualLocReq a) {
         ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
