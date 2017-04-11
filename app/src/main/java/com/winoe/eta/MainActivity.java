@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.location.Location;
+import android.renderscript.RenderScript;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -20,9 +21,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -149,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             reqLocPerms(ActualLocReq.SETLOCENABLED);
         }
         mapa.setMyLocationEnabled(true);
+        mapa.getUiSettings().setMyLocationButtonEnabled(false);
         mapa.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
             @Override public void onCameraMoveStarted(int i) {
                 if(!autoMove){
@@ -157,11 +161,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
-        mapa.getUiSettings().setMyLocationButtonEnabled(false);
         myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         goToLocation(myLocation);
         mapa.setTrafficEnabled(false);
         mapa.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {@Override public void onMapLongClick(LatLng latLng){mapa.addMarker(new MarkerOptions().position(latLng).title("Marcador Colocado"));}});
+        Log.println(Log.INFO, "textSize", String.valueOf(((EditText) findViewById(R.id.buscarTxt)).getTextSize()));
     }
     void reqLocPerms(ActualLocReq a) {
         ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
