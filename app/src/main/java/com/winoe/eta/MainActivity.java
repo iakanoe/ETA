@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         options.mapToolbarEnabled(false);
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapa);
         mapFragment.getMapAsync(this);
-        mapFragment.newInstance(options);
+        MapFragment.newInstance(options);
     }
     @Override public void onMapReady(GoogleMap map1) {
         mapa = map1;
