@@ -46,21 +46,21 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, NavigationView.OnNavigationItemSelectedListener {
     enum ActualLocReq {
-        INICIAL, SETLOCENABLED
+        INICIAL
     }
     ActualLocReq actualLocReq;
     GoogleApiClient mGoogleApiClient;
     Location myLocation;
-    GoogleMapOptions options;
     static final LatLngBounds CABABounds = new LatLngBounds(new LatLng(-34.771753, -58.593714), new LatLng(-34.501140, -58.272363));
-    GoogleMap mapa, mapReq;
-    boolean boolReqs, seguirLoc, booleanReq, autoMove = false;
+    GoogleMap mapa;
+    boolean boolReqs, seguirLoc, autoMove = false;
 
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         pedirPermisos();
+        initializeDesign();
     }
     void initializeDesign(){
         LinearLayout ll = (LinearLayout) findViewById(R.id.persistentSearch);
@@ -76,15 +76,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override public void onClick(View v) {
                 goToLocation(myLocation);
                 seguirLoc = true;
-                setForegroundTint(findViewById(R.id.fab), Color.BLUE);
+                setFABColor((FloatingActionButton) findViewById(R.id.fab), R.color.fabTintSiguiendo);
             }
         });
         crearApiClient();
     }
-    @TargetApi(23) void setForegroundTint(View v, int color){
+    void setFABColor(FloatingActionButton f, int color){
         int[][] states = new int[][] {new int[] { android.R.attr.state_enabled}, new int[] {-android.R.attr.state_enabled}, new int[] {-android.R.attr.state_checked}, new int[] { android.R.attr.state_pressed}};
         int[] colors = new int[] {color, color, color, color};
-        v.setForegroundTintList(new ColorStateList(states, colors));
+        f.setImageTintList(new ColorStateList(states, colors));
     }
     @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
         menuItem.setChecked(true);
@@ -115,67 +115,46 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return result;
     }
     @Override public void onConnected(Bundle connectionHint) {
-        generarOpciones();
+        Log.println(Log.ASSERT, null, "conectado");
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapa);
+        mapFragment.getMapAsync(this);
+        MapFragment.newInstance(new GoogleMapOptions()
+                .compassEnabled(true)
+                .mapType(GoogleMap.MAP_TYPE_NORMAL)
+                .rotateGesturesEnabled(true)
+                .scrollGesturesEnabled(true)
+                .tiltGesturesEnabled(true)
+                .zoomControlsEnabled(false)
+                .zoomGesturesEnabled(true)
+                .mapToolbarEnabled(false));
     }
     @Override public void onConnectionSuspended(int i) {
     }
     @Override public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-    void generarOpciones() {
-        options = new GoogleMapOptions();
-        options.compassEnabled(true);
-        options.latLngBoundsForCameraTarget(CABABounds);
-        options.mapType(GoogleMap.MAP_TYPE_NORMAL);
-        options.rotateGesturesEnabled(true);
-        options.scrollGesturesEnabled(true);
-        options.tiltGesturesEnabled(true);
-        options.zoomControlsEnabled(false);
-        options.zoomGesturesEnabled(true);
-        options.mapToolbarEnabled(false);
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapa);
-        mapFragment.getMapAsync(this);
-        MapFragment.newInstance(options);
-    }
     @Override public void onMapReady(GoogleMap map1) {
         mapa = map1;
-        configMap();
-    }
-    void configMap() {
-        seguirLoc = true;
-        mapa.setBuildingsEnabled(false);
+        mapa.setBuildingsEnabled(true);
         mapa.setIndoorEnabled(true);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            mapReq = mapa;
-            booleanReq = true;
-            boolReqs = true;
-            reqLocPerms(ActualLocReq.SETLOCENABLED);
-        }
+        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) pedirPermisos();
         mapa.setMyLocationEnabled(true);
         mapa.getUiSettings().setMyLocationButtonEnabled(false);
-        mapa.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
-            @Override public void onCameraMoveStarted(int i) {
-                if(!autoMove){
-                    seguirLoc = false;
-                    setForegroundTint(findViewById(R.id.fab), Color.BLACK);
-                }
-            }
-        });
         myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        goToLocation(myLocation);
+        setSiguiendo(true);
+        mapa.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {@Override public void onCameraMoveStarted(int i) {if(!autoMove) setSiguiendo(false);}});
         mapa.setTrafficEnabled(false);
         mapa.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {@Override public void onMapLongClick(LatLng latLng){mapa.addMarker(new MarkerOptions().position(latLng).title("Marcador Colocado"));}});
-        Log.println(Log.ASSERT, "textSize", String.valueOf(((EditText) findViewById(R.id.buscarTxt)).getTextSize()));
     }
     void reqLocPerms(ActualLocReq a) {
         ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
         actualLocReq = a;
     }
     void pedirPermisos() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             boolReqs = true;
             reqLocPerms(ActualLocReq.INICIAL);
-        } else initializeDesign();
+        }
     }
     void cierraApp() {
         finish();
@@ -196,5 +175,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         autoMove = true;
         mapa.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(loc.getLatitude(), loc.getLongitude()), 18));
         autoMove = false;
+    }
+    void setSiguiendo(Boolean value){
+        seguirLoc = value;
+        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) pedirPermisos();
+        int color = (value ? R.color.fabTintSiguiendo : R.color.fabTintNormal);
+        int[][] states = new int[][] {new int[] { android.R.attr.state_enabled}, new int[] {-android.R.attr.state_enabled}, new int[] {-android.R.attr.state_checked}, new int[] { android.R.attr.state_pressed}};
+        int[] colors = new int[] {color, color, color, color};
+        ((FloatingActionButton) findViewById(R.id.fab)).setImageTintList(new ColorStateList(states, colors));
+        if(value) goToLocation(myLocation);
     }
 }
